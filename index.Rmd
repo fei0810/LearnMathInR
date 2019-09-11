@@ -1,0 +1,5 @@
+---
+title: "Leanr Math in R"
+---
+
+## 通过 R 巩固学习基础数学知识

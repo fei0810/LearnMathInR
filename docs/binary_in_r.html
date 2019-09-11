@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>二进制的理解与应用</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Learn Math in R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="archives.html">Archives</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">二进制的理解与应用</h1>
+
+</div>
+
+
+<div id="section" class="section level2">
+<h2>什么是二进制</h2>
+<div id="section-1" class="section level3">
+<h3>十进制的理解方法</h3>
+<p><img src="https://raw.githubusercontent.com/fei0810/image-host/master/img/20190911100951.jpg" /></p>
+<p>以2871为例，其中 ^ 表示幂或次方运算。十进制的数位（千位、百位、十位等）全部都是 10^n 的形式。需要特别注意的是，任何非 0 数字的 0 次方均为 1。在这个新的表示式里，10 被称为十进制计数法的基数，也是十进制中“十”的由来。</p>
+</div>
+<div id="section-2" class="section level3">
+<h3>二进制的理解方法</h3>
+<p>十进制计数是使用 10 作为基数，那么二进制就是使用 2 作为基数，类比过来，二进制的数位就是 2^n 的形式。如果需要将这个数字转化为人们易于理解的十进制，我们就可以这样来计算：</p>
+<p><img src="https://raw.githubusercontent.com/fei0810/image-host/master/img/20190911101032.jpg" /></p>
+</div>
+</div>
+<div id="section-3" class="section level2">
+<h2>二进制和十进制的转换</h2>
+<p>二进制转换十进制在 R 中有中直接的function可以使用。但是在十进制转为二进制的时候会自动填补32位，所以数字看起来会很长。</p>
+<p>r base package strtoi</p>
+<blockquote>
+<p>Convert strings to integers according to the given base using the C function strtol, or choose a suitable base following the C rules.</p>
+</blockquote>
+<pre class="r"><code># bin2dec
+strtoi(&quot;110101&quot;, base = 2)</code></pre>
+<pre><code>## [1] 53</code></pre>
+<pre class="r"><code># dec2bin\
+paste(rev(as.integer(intToBits(53))), collapse=&quot;&quot;)</code></pre>
+<pre><code>## [1] &quot;00000000000000000000000000110101&quot;</code></pre>
+<p>R.utils 包中的韩式 <code>intTobin</code> 可以解决这个问题，但是对数字的大小会有限制，也就是最大2^32</p>
+<pre class="r"><code>library(R.utils)
+intToBin(53)</code></pre>
+<pre><code>## [1] &quot;110101&quot;</code></pre>
+<p>也可以自己写函数根据转换规则进行解析。</p>
+<pre class="r"><code>dec2bin &lt;- function(fnum) {
+  bin_vect &lt;- rep(0, 1 + floor(log(fnum, 2)))
+  while (fnum &gt;= 2) {
+    pow &lt;- floor(log(fnum, 2))
+    bin_vect[1 + pow] &lt;- 1
+    fnum &lt;- fnum - 2^pow
+  } # while
+  bin_vect[1] &lt;- fnum %% 2
+  paste(rev(bin_vect), collapse = &quot;&quot;)
+} #dec2bin
+# form 
+dec2bin(53)</code></pre>
+<pre><code>## [1] &quot;110101&quot;</code></pre>
+<p>除此之外还可以使用 DescTools 包来进行两个方向的转换。</p>
+<pre class="r"><code>#install.packages(&quot;DescTools&quot;)
+library(DescTools)
+BinToDec(110101)</code></pre>
+<pre><code>## [1] 53</code></pre>
+<pre class="r"><code>DecToBin(53)</code></pre>
+<pre><code>## [1] &quot;110101&quot;</code></pre>
+</div>
+<div id="section-4" class="section level2">
+<h2>二进制的左移位和右移位</h2>
+<p>base 包中<code>bit</code>开头的若干<code>function</code>其实都是和二进制相关的。其中<code>bitwShiftL</code>是向左移位；<code>bitwSifhtR</code> 是向右移位。</p>
+<p>二进制 110101 向左移一位，就是在末尾添加一位 0，因此 110101 就变成了1101010。这里讨论的是数字没有溢出的情况。所谓<strong>数字溢出，就是二进制数的位数超过了系统所指定的位数</strong>。目前主流的系统都支持至少32位的整型数字，而 1101010 远未超过32位，所以不会溢出。如果进行左移操作的二进制已经超出了 32 位，左移后数字就会溢出，需要将溢出的位数去除。<strong>二进制左移一位，其实就是将数字翻倍</strong>。</p>
+<p>二进制 110101 向右移一位，就是去除末尾的那一位，因此 110101 就变成了 11010（最前面的 0 可以省略）。我们将 11010 换算为十进制，就是 26，正好是 53 除以 2 的整数商。**所以二进制右移一位，就是将数字除以 2 并求整数商的操作*。**</p>
+<p>通过R语言完成响应的计算方法如下：</p>
+<pre class="r"><code>bitwShiftL(53,1)</code></pre>
+<pre><code>## [1] 106</code></pre>
+<pre class="r"><code>bitwShiftR(53,1)</code></pre>
+<pre><code>## [1] 26</code></pre>
+<pre class="r"><code>bitwShiftL(53,3)</code></pre>
+<pre><code>## [1] 424</code></pre>
+<pre class="r"><code>bitwShiftR(53,3)</code></pre>
+<pre><code>## [1] 6</code></pre>
+</div>
+<div id="section-5" class="section level2">
+<h2>位的逻辑操作</h2>
+<p>二进制的“1”和“0”分别对应逻辑中的“真”和“假”，因此可以针对位进行逻辑操作。</p>
+<p>逻辑“或”的意思是，参与操作的位中只要有一个位是1，那么最终结果就是1，也就是“真”。如果我们将二进制 110101 和 100011 的每一位对齐，进行按位的“或”操作，就会得到 110111。</p>
+<p>同理，我们也可以针对位进行逻辑“与”的操作。“与”的意思是，参与操作的位中必须全都是 1，那么最终结果才是 1（真），否则就为 0（假）。如果我们将二进制 110101 和 100011 的每一位对齐，进行按位的“与”操作，就会得到 100001。</p>
+<p>逻辑“异或”和“或”有所不同，它具有排异性，也就是说如果参与操作的位相同，那么最终结果就为 0（假），否则为 1（真）。所以，如果要得到 1，参与操作的两个位必须不同，这就是此处“异”的含义。我们将二进制 110101 和 100011 的每一位对齐，进行按位的“异或”操作，可以得到结果是 10110。</p>
+<p>“异或”操作的本质其实就是，所有数值和自身进行按位的“异或”操作之后都为 0。而且要通过“异或”操作得到 0，也必须通过两个相同的数值进行按位“异或”。<strong>这表明了两个数值按位“异或”结果为 0，是这两个数值相等的必要充分条件，可以作为判断两个变量是否相等的条件。</strong>(这里就位我们提供了一个进行变量是否相等判断的方法)</p>
+<p>在R中分别对应的三个函数来自 base 包，为<code>bitwOR</code>,<code>bitwAnd</code>和<code>bioXor</code></p>
+<pre class="r"><code>bitwOr(53,35)</code></pre>
+<pre><code>## [1] 55</code></pre>
+<pre class="r"><code>bitwAnd(53,35)</code></pre>
+<pre><code>## [1] 33</code></pre>
+<pre class="r"><code>bitwXor(53,35)</code></pre>
+<pre><code>## [1] 22</code></pre>
+<p>如果想要理解为什么是这样的输出结果需要查看输入和输出的二进制表示，然后在理解上文的理论描述。</p>
+<pre class="r"><code>library(DescTools)
+
+DecToBin(53)</code></pre>
+<pre><code>## [1] &quot;110101&quot;</code></pre>
+<pre class="r"><code>DecToBin(35)</code></pre>
+<pre><code>## [1] &quot;100011&quot;</code></pre>
+<pre class="r"><code>DecToBin(55)</code></pre>
+<pre><code>## [1] &quot;110111&quot;</code></pre>
+<pre class="r"><code>DecToBin(33)</code></pre>
+<pre><code>## [1] &quot;100001&quot;</code></pre>
+<pre class="r"><code>DecToBin(22)</code></pre>
+<pre><code>## [1] &quot;10110&quot;</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
