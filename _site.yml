@@ -1,0 +1,12 @@
+name: "LearnMathinR"
+output_dir: "docs"
+navbar:
+        title: "Learn Math in R"
+        left:
+                - text: "Home"
+                  href: index.html
+                - text: "Archives"
+                  href: archives.html
+output:
+        html_document:
+theme: cosmo
