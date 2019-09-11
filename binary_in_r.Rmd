@@ -1,0 +1,126 @@
+---
+title: "二进制的理解与应用"
+author: "https://kaopubear.top"
+date: "2019/9/11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## 什么是二进制
+
+### 十进制的理解方法
+
+![](https://raw.githubusercontent.com/fei0810/image-host/master/img/20190911100951.jpg)
+
+以2871为例，其中 ^ 表示幂或次方运算。十进制的数位（千位、百位、十位等）全部都是 10^n 的形式。需要特别注意的是，任何非 0 数字的 0 次方均为 1。在这个新的表示式里，10 被称为十进制计数法的基数，也是十进制中“十”的由来。
+
+### 二进制的理解方法
+
+十进制计数是使用 10 作为基数，那么二进制就是使用 2 作为基数，类比过来，二进制的数位就是 2^n 的形式。如果需要将这个数字转化为人们易于理解的十进制，我们就可以这样来计算：
+
+![](https://raw.githubusercontent.com/fei0810/image-host/master/img/20190911101032.jpg)
+
+## 二进制和十进制的转换
+
+二进制转换十进制在 R 中有中直接的function可以使用。但是在十进制转为二进制的时候会自动填补32位，所以数字看起来会很长。
+
+r base package strtoi
+
+> Convert strings to integers according to the given base using the C function strtol, or choose a suitable base following the C rules.
+
+
+```{r}
+# bin2dec
+strtoi("110101", base = 2)
+# dec2bin\
+paste(rev(as.integer(intToBits(53))), collapse="")
+
+```
+
+R.utils 包中的韩式 `intTobin` 可以解决这个问题，但是对数字的大小会有限制，也就是最大2^32
+
+```{r warning=FALSE,message=FALSE}
+library(R.utils)
+intToBin(53)
+```
+
+也可以自己写函数根据转换规则进行解析。
+
+```{r}
+dec2bin <- function(fnum) {
+  bin_vect <- rep(0, 1 + floor(log(fnum, 2)))
+  while (fnum >= 2) {
+    pow <- floor(log(fnum, 2))
+    bin_vect[1 + pow] <- 1
+    fnum <- fnum - 2^pow
+  } # while
+  bin_vect[1] <- fnum %% 2
+  paste(rev(bin_vect), collapse = "")
+} #dec2bin
+# form 
+dec2bin(53)
+
+```
+
+除此之外还可以使用 DescTools 包来进行两个方向的转换。
+
+```{r}
+#install.packages("DescTools")
+library(DescTools)
+BinToDec(110101)
+DecToBin(53)
+
+```
+
+## 二进制的左移位和右移位
+
+base 包中`bit`开头的若干`function`其实都是和二进制相关的。其中`bitwShiftL`是向左移位；`bitwSifhtR` 是向右移位。
+
+二进制 110101 向左移一位，就是在末尾添加一位 0，因此 110101 就变成了1101010。这里讨论的是数字没有溢出的情况。所谓**数字溢出，就是二进制数的位数超过了系统所指定的位数**。目前主流的系统都支持至少32位的整型数字，而 1101010 远未超过32位，所以不会溢出。如果进行左移操作的二进制已经超出了 32 位，左移后数字就会溢出，需要将溢出的位数去除。**二进制左移一位，其实就是将数字翻倍**。
+
+二进制 110101 向右移一位，就是去除末尾的那一位，因此 110101 就变成了 11010（最前面的 0 可以省略）。我们将 11010 换算为十进制，就是 26，正好是 53 除以 2 的整数商。**所以二进制右移一位，就是将数字除以 2 并求整数商的操作*。**
+
+通过R语言完成响应的计算方法如下：
+
+```{r}
+bitwShiftL(53,1)
+bitwShiftR(53,1)
+
+bitwShiftL(53,3)
+bitwShiftR(53,3)
+```
+ 
+## 位的逻辑操作
+
+二进制的“1”和“0”分别对应逻辑中的“真”和“假”，因此可以针对位进行逻辑操作。
+
+逻辑“或”的意思是，参与操作的位中只要有一个位是1，那么最终结果就是1，也就是“真”。如果我们将二进制 110101 和 100011 的每一位对齐，进行按位的“或”操作，就会得到 110111。
+
+同理，我们也可以针对位进行逻辑“与”的操作。“与”的意思是，参与操作的位中必须全都是 1，那么最终结果才是 1（真），否则就为 0（假）。如果我们将二进制 110101 和 100011 的每一位对齐，进行按位的“与”操作，就会得到 100001。
+
+逻辑“异或”和“或”有所不同，它具有排异性，也就是说如果参与操作的位相同，那么最终结果就为 0（假），否则为 1（真）。所以，如果要得到 1，参与操作的两个位必须不同，这就是此处“异”的含义。我们将二进制 110101 和 100011 的每一位对齐，进行按位的“异或”操作，可以得到结果是 10110。
+
+“异或”操作的本质其实就是，所有数值和自身进行按位的“异或”操作之后都为 0。而且要通过“异或”操作得到 0，也必须通过两个相同的数值进行按位“异或”。**这表明了两个数值按位“异或”结果为 0，是这两个数值相等的必要充分条件，可以作为判断两个变量是否相等的条件。**(这里就位我们提供了一个进行变量是否相等判断的方法)
+
+在R中分别对应的三个函数来自 base 包，为`bitwOR`,`bitwAnd`和`bioXor`
+
+```{r}
+bitwOr(53,35)
+bitwAnd(53,35)
+bitwXor(53,35)
+```
+
+如果想要理解为什么是这样的输出结果需要查看输入和输出的二进制表示，然后在理解上文的理论描述。
+
+```{r}
+library(DescTools)
+
+DecToBin(53)
+DecToBin(35)
+DecToBin(55)
+DecToBin(33)
+DecToBin(22)
+```
+
