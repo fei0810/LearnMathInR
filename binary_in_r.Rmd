@@ -1,5 +1,10 @@
 ---
 title: "二进制的理解与应用"
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
 author: "https://kaopubear.top"
 date: "2019/9/11"
 output: html_document
