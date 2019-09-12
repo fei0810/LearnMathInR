@@ -1,8 +1,0 @@
----
-title: "archives"
----
-
-## 文章列表
-
-1. [二进制的理解与应用](binary_in_r.html)
-
