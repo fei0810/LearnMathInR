@@ -1,8 +1,8 @@
 ---
 title: "二进制的理解与应用"
-output: 
-  html_document:
-    toc: true 
+# output: 
+#   html_document:
+#     toc: true 
 ---
 
 ```{r setup, include=FALSE}
